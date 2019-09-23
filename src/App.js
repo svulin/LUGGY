@@ -54,7 +54,7 @@ function App() {
           trackUserLocation={true}
           fitBoundsOptions = {{maxZoom:7}}
           showUserLocation = {true}
-          trackUserLocationend = {true}
+          trackUserLocationend = {false}
       />
         {parkDate.features.map(park => (
           <Marker 
