@@ -51,8 +51,10 @@ function App() {
       <GeolocateControl
           style={geolocateStyle}
           positionOptions={{enableHighAccuracy: true}}
-          trackUserLocation={false}
-          fitBoundsOptions = {{maxZoom:10}}
+          trackUserLocation={true}
+          fitBoundsOptions = {{maxZoom:7}}
+          showUserLocation = {true}
+          trackUserLocationend = {true}
       />
         {parkDate.features.map(park => (
           <Marker 
