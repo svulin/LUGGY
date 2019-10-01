@@ -1,84 +1,66 @@
-import React, { useState, useEffect } from "react";
-import {
-  withGoogleMap,
-  withScriptjs,
-  GoogleMap,
-  Marker,
-  InfoWindow
-} from "react-google-maps";
-import * as parkData from "./data/skateboard-parks.json";
-import mapStyles from "./mapStyles";
+import React, { Component } from 'react';
+import { GoogleApiWrapper, InfoWindow, Marker } from 'google-maps-react';
 
-function Map() {
-  const [selectedPark, setSelectedPark] = useState(null);
+import CurrentLocation from './Map';
 
-  useEffect(() => {
-    const listener = e => {
-      if (e.key === "Escape") {
-        setSelectedPark(null);
-      }
-    };
-    window.addEventListener("keydown", listener);
 
-    return () => {
-      window.removeEventListener("keydown", listener);
-    };
-  }, []);
+export class MapContainer extends Component {
+  state = {
+    showingInfoWindow: false,
+    activeMarker: {},
+    selectedPlace: {}
+  };
 
-  return (
-    <GoogleMap
-      defaultZoom={10}
-      defaultCenter={{ lat: 55.7558, lng: 37.6173 }}
-      defaultOptions={{ styles: mapStyles }}
-    >
-      {parkData.features.map(park => (
-        <Marker
-          key={park.properties.PARK_ID}
-          position={{
-            lat: park.geometry.coordinates[1],
-            lng: park.geometry.coordinates[0]
-          }}
-          onClick={() => {
-            setSelectedPark(park);
-          }}
-          icon={{
-            url: `/bag.svg`,
-            scaledSize: new window.google.maps.Size(25, 25)
-          }}
-        />
-      ))}
+  onMarkerClick = (props, marker, e) =>
+    this.setState({
+      selectedPlace: props,
+      activeMarker: marker,
+      showingInfoWindow: true
+    });
 
-      {selectedPark && (
+  onClose = props => {
+    if (this.state.showingInfoWindow) {
+      this.setState({
+        showingInfoWindow: false,
+        activeMarker: null
+      });
+    }
+  };
+
+  render() {
+    return (
+      <div 
+  style = {{width: '100vw', height:'100vh'}}
+  >
+      <CurrentLocation
+        centerAroundCurrentLocation
+        google={this.props.google}
+      >
+        {<Marker
+              icon={{
+                url: `https://img.icons8.com/color/96/000000/sphere.png`,
+                scaledSize: new window.google.maps.Size(25, 25)
+              }}
+        />}
+        {/* <Marker onClick={this.onMarkerClick} name={'current location'} />
         <InfoWindow
-          onCloseClick={() => {
-            setSelectedPark(null);
-          }}
-          position={{
-            lat: selectedPark.geometry.coordinates[1],
-            lng: selectedPark.geometry.coordinates[0]
-          }}
+          marker={this.state.activeMarker}
+          visible={this.state.showingInfoWindow}
+          onClose={this.onClose}
         >
           <div>
-            <h2>{selectedPark.properties.NAME}</h2>
-            <p>{selectedPark.properties.DESCRIPTIO}</p>
+            <h4>{this.state.selectedPlace.name}</h4>
           </div>
-        </InfoWindow>
-      )}
-    </GoogleMap>
-  );
+        </InfoWindow> */}
+      </CurrentLocation>
+
+
+      </div>
+    );
+  }
 }
 
-const MapWrapped = withScriptjs(withGoogleMap(Map));
 
-export default function App() {
-  return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      <MapWrapped
-        googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=AIzaSyCKAN6fTGh5E7IBMDHULe-JQkJJcIeM0_Q`}
-        loadingElement={<div style={{ height: `100%` }} />}
-        containerElement={<div style={{ height: `100%` }} />}
-        mapElement={<div style={{ height: `100%` }} />}
-      />
-    </div>
-  );
-}
+export default GoogleApiWrapper({
+  apiKey: 'AIzaSyCKAN6fTGh5E7IBMDHULe-JQkJJcIeM0_Q'
+})(MapContainer);
