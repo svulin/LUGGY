@@ -1,27 +1,12 @@
-const express = require('express')
-    const bodyParser = require('body-parser')
-    const Pusher = require('pusher');
 
-    // create a express application
-    const app = express();
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 5000;
 
-    // initialize pusher
-    let pusher = new Pusher({
-        appId: 'PUSHER_APP_ID',
-        key: 'PUSHER_APP_KEY',
-        secret: 'PUSHER_APP_SECRET',
-        cluster: 'PUSHER_APP_CLUSTER',
-        encrypted: true
-    });
+// console.log that your server is up and running
+app.listen(port, () => console.log(`Listening on port ${port}`));
 
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: false }));
-    // to Allow CORS
-    app.use((req, res, next) => {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header(
-            'Access-Control-Allow-Headers',
-            'Origin, X-Requested-With, Content-Type, Accept'
-        );
-        next();
-    });
+// create a GET route
+app.get('/express_backend', (req, res) => {
+  res.send({ express: 'YOUR EXPRESS BACKEND IS CONNECTED TO REACT' });
+})

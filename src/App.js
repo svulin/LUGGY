@@ -1,93 +1,106 @@
-//https://www.fullstackreact.com/articles/how-to-write-a-google-maps-react-component/
+//https://studio.mapbox.com/
+// https://www.pika.dev/packages/@urbica/react-map-gl
+//https://github.com/uber/react-map-gl/blob/5.0-release/examples/interaction/src/marker-style.js
+//очень хороший стиль у этой карты
+import React, { useState, useEffect, Component} from "react";
+import ReactMapGL, { Marker, Popup, GeolocateControl } from "react-map-gl";
+import * as placeData from "./data/places.json";
 
-import React, { useState, useEffect } from "react";
-import {
-  withGoogleMap,
-  withScriptjs,
-  GoogleMap,
-  Marker,
-  InfoWindow
-} from "react-google-maps";
-import * as parkData from "./data/skateboard-parks.json";
-import mapStyles from "./mapStyles";
 
-function Map() {
-  const [selectedPark, setSelectedPark] = useState(null);
+const geolocateStyle = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  margin: 10
+}
 
-  useEffect(() => {
+// https://stackoverflow.com/questions/55766165/how-to-not-change-camera-center-upon-geolocatecontrol-trigger
+// const locate = new ReactMapGL.GeolocateControl({
+//   positionOptions: { enableHighAccuracy: true },
+//   trackUserLocation: true
+// })
+// // hacky workaround for the fact that mapbox doesn't let you disable camera auto-tracking
+// locate._updateCamera = () => {}
+// this.map.addControl(locate)
+
+function App() {
+  const [viewport, setViewport] = useState({
+    latitude: 55.7558,
+    longitude: 37.6173,
+    width: "100vw",
+    height: "100vh",
+    zoom: 10
+  })
+  const [selectedPark, setSelectedPark] = useState(null)
+  const [userLocation, SetUserLocation] = useState (null)
+// navigator.geolocation.getCurrentPosition
+  useEffect(() => { //для использования клавиатуры
     const listener = e => {
       if (e.key === "Escape") {
         setSelectedPark(null);
       }
     };
     window.addEventListener("keydown", listener);
-
     return () => {
       window.removeEventListener("keydown", listener);
     };
   }, []);
 
   return (
-    <GoogleMap
-      defaultZoom={10}
-      defaultCenter={{ lat: 55.7558, lng: 37.6173 }}
-      defaultOptions={{ styles: mapStyles }}
-    >
-      {parkData.features.map(park => (
-        <Marker
-          key={park.properties.PARK_ID}
-          position={{
-            lat: park.geometry.coordinates[1],
-            lng: park.geometry.coordinates[0]
-          }}
-          onClick={() => {
-            setSelectedPark(park);
-          }}
-          icon={{
-            url: `/bag.svg`,
-            scaledSize: new window.google.maps.Size(25, 25)
-          }}
-        />
-      ))}
+    <div>
+      <ReactMapGL
+        {...viewport}
+        width="100vw"
+        height="100vh" 
+        mapboxApiAccessToken='pk.eyJ1Ijoic2F1bGluIiwiYSI6ImNrMHQ4YXdnNzA1cHozY3FwcXducngzNGQifQ.I1n0Ecna664hDQ4PSh5d-w'
+      //  mapStyle = 'mapbox://styles/saulin/ck0t9espm0f6p1cqzdug9il7d'
+        onViewportChange = {viewport=>{
+          setViewport(viewport) //для обновления крты. Присваиваем новое состояние
+        }}
+      >
 
-      {selectedPark && (
-        <InfoWindow
-          onCloseClick={() => {
-            setSelectedPark(null);
-          }}
-          position={{
-            lat: selectedPark.geometry.coordinates[1],
-            lng: selectedPark.geometry.coordinates[0]
-          }}
-        >
-          <div>
-            <h2>{selectedPark.properties.NAME}</h2>
-            <p>{selectedPark.properties.DESCRIPTIO}</p>
-          </div>
-        </InfoWindow>
-      )}
-    </GoogleMap>
-  );
-}
-
-
-function myLocation () {
-
-}
-
-const MapWrapped = withScriptjs(withGoogleMap(Map));
-
-
-export default function App() {
-  return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      <MapWrapped
-        googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=AIzaSyCKAN6fTGh5E7IBMDHULe-JQkJJcIeM0_Q`}
-        loadingElement={<div style={{ height: `100%` }} />}
-        containerElement={<div style={{ height: `100%` }} />}
-        mapElement={<div style={{ height: `100%` }} />}
+      <GeolocateControl
+          style={geolocateStyle}
+          positionOptions={{enableHighAccuracy: true}}
+          trackUserLocation ={true}
+          fitBoundsOptions = {{maxZoom:10}}
+          showUserLocation = {true}
+//https://github.com/uber/react-map-gl/pull/761
       />
-	  
+        {placeData.features.map(park => (
+          <Marker 
+            key={park.properties._ID}
+            latitude = {park.geometry.coordinates[1]}
+            longitude = {park.geometry.coordinates[0]}
+          >
+            <button 
+              className = 'marker-btn'
+              onClick = {e => {
+                e.preventDefault()
+                setSelectedPark(park)
+              }} 
+            >
+              <img src = '/bag.svg' alt='x'/>
+            </button>
+          </Marker>
+        ))}
+        {selectedPark ? (//если парк выбран, то .., иначе null
+          <Popup //отображlает всплывающие окна
+            latitude = {selectedPark.geometry.coordinates[1]}
+            longitude = {selectedPark.geometry.coordinates[0]}
+            onClose = {() => {
+              setSelectedPark(null)
+            }}
+          >
+            <div>
+              <h2>{selectedPark.properties.NAME}</h2>
+              <p>{selectedPark.properties.DESCRIPTION}</p>
+            </div>
+          </Popup>
+        ):null }
+      </ReactMapGL>
     </div>
-  );
+  )
 }
+
+export default App 
