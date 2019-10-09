@@ -1,0 +1,45 @@
+{
+  "type": "FeatureCollection",
+  "crs": {
+    "type": "name",
+    "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "_ID": 1,
+        "NAME": "2015",
+        "DESCRIPTION": "Барбершоп"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [37.5372987731628, 55.83321536272049]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "_ID": 2,
+        "NAME": "Snicker Shop",
+        "DESCRIPTION": "Магазин кросовок"
+		},
+      "geometry": {
+        "type": "Point",
+        "coordinates": [37.546518086577947, 55.667134581917357]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "_ID": 3,
+        "NAME": "Azbuka",
+        "DESCRIPTION": "Супермаркет"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [37.638610599532319, 55.75014379864874]
+      }
+    }
+  ]
+}
