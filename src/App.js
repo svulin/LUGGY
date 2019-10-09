@@ -1,7 +1,10 @@
 //https://studio.mapbox.com/
 // https://www.pika.dev/packages/@urbica/react-map-gl
 //https://github.com/uber/react-map-gl/blob/5.0-release/examples/interaction/src/marker-style.js
-//очень хороший стиль у этой карты
+//https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md
+//https://monumap.com/app/detail/514
+//https://kassa.yandex.ru/developers/using-api/basics
+
 import React, { useState, useEffect, Component} from "react";
 import ReactMapGL, { Marker, Popup, GeolocateControl } from "react-map-gl";
 import * as placeData from "./data/places.json";
@@ -31,13 +34,13 @@ function App() {
     height: "100vh",
     zoom: 10
   })
-  const [selectedPark, setSelectedPark] = useState(null)
+  const [selectedPlace, setSelectedPlace] = useState(null)
   const [userLocation, SetUserLocation] = useState (null)
 // navigator.geolocation.getCurrentPosition
   useEffect(() => { //для использования клавиатуры
     const listener = e => {
       if (e.key === "Escape") {
-        setSelectedPark(null);
+        setSelectedPlace(null);
       }
     };
     window.addEventListener("keydown", listener);
@@ -77,24 +80,25 @@ function App() {
               className = 'marker-btn'
               onClick = {e => {
                 e.preventDefault()
-                setSelectedPark(park)
+                setSelectedPlace(park)
               }} 
             >
               <img src = '/bag.svg' alt='x'/>
             </button>
           </Marker>
         ))}
-        {selectedPark ? (//если парк выбран, то .., иначе null
+        {selectedPlace ? (//если парк выбран, то .., иначе null
           <Popup //отображlает всплывающие окна
-            latitude = {selectedPark.geometry.coordinates[1]}
-            longitude = {selectedPark.geometry.coordinates[0]}
+            latitude = {selectedPlace.geometry.coordinates[1]}
+            longitude = {selectedPlace.geometry.coordinates[0]}
             onClose = {() => {
-              setSelectedPark(null)
+              setSelectedPlace(null)
             }}
           >
             <div>
-              <h2>{selectedPark.properties.NAME}</h2>
-              <p>{selectedPark.properties.DESCRIPTION}</p>
+              <h2>{selectedPlace.properties.NAME}</h2>
+              <p>{selectedPlace.properties.DESCRIPTION}</p>
+			  <a href="https://yandex.ru/">pay</a>
             </div>
           </Popup>
         ):null }
